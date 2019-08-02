@@ -1,10 +1,10 @@
 # Lab06-back-end
 
-Lab 06 - Tuesday 7/30/2019 
+Lab 07 - 
 Node
 NPM
 Express
-with PT and Val
+with PT and James
 
 NPM Steps
  1. npm init -y
