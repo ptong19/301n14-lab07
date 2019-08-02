@@ -16,15 +16,17 @@ app.listen(PORT, () => console.log(`Server is up on port ${PORT}`));
 
 // routes
 app.get("/location", (req, res) => {
-  try {
-    const geoData = require("./data/geo.json");
-    const location = new Location(geoData, req.query.data);
-    console.log(location);
-    res.send(location);
-  } catch (error) {
-    console.log("There was an error in /location get");
-    res.status(500).send("Server error", error);
-  }
+  handleLocation(req, res);
+  //   try {
+  //     searchLatLong(request.query.data).then(location => response.send(location));
+  //     // const geoData = require("./data/geo.json");
+  //     // const location = new Location(geoData, req.query.data);
+  //     // console.log(location);
+  //     // res.send(location);
+  //   } catch (error) {
+  //     console.log("There was an error in /location get");
+  //     res.status(500).send("Server error", error);
+  //   }
 });
 
 app.get("/weather", (request, response) => {
@@ -41,14 +43,29 @@ app.get("/weather", (request, response) => {
 
 //Helper Functions
 
+function handleLocation(request, response) {
+  searchLatLong(request.query.data)
+    .then(location => response.send(location))
+    .catch(error => handleError(error, response));
+}
+
 function Location(data, res) {
   this.search_query = res;
-  this.formatted_query = data.results[0].formatted_address;
-  this.latitude = data.results[0].geometry.location.lat;
-  this.longitude = data.results[0].geometry.location.lng;
+  this.formatted_query = data.body.results[0].formatted_address;
+  this.latitude = data.body.results[0].geometry.location.lat;
+  this.longitude = data.body.results[0].geometry.location.lng;
 }
 
 function Forecast(day) {
   this.forecast = day.summary;
   this.time = new Date(day.time * 1000).toString().slice(0, 15);
+}
+
+function searchLatLong(query) {
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${
+    process.env.GEOCODE_API_KEY
+  }`;
+  return superagent.get(url).then(res => {
+    return new Location(query, res);
+  });
 }
