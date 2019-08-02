@@ -1,54 +1,20 @@
 "use strict";
 
-// application dependencies
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const app = express();
 const superagent = require("superagent");
+const PORT = process.env.PORT || 3000;
 app.use(cors());
 
-// configure environment variables
-require("dotenv").config();
-const PORT = process.env.PORT || 3000;
-
-// tell our express server to start listening on port PORT
-app.listen(PORT, () => console.log(`Server is up on port ${PORT}`));
-
-// routes
-// app.get("/location", (req, res) => {
-//   try {
-//   searchLatLong(req);
-// const geoData = require("./data/geo.json");
-// const location = new Location(geoData, req.query.data);
-// console.log(location);
-// res.send(location);
-//   } catch (error) {
-//     console.log("There was an error in /location get");
-//     res.status(500).send("Server error", error);
-//   }
-// });
-app.get("/location", (request, response) => {
-  searchLatLong(request.query.data).then(location => response.send(location));
-});
-
-app.get("/weather", (request, response) => {
-  try {
-    const weatherData = require("./data/darksky.json");
-    const dailyWeather = Object.values(weatherData.daily.data);
-    const daysForecast = dailyWeather.map(day => new Forecast(day));
-    response.send(daysForecast);
-  } catch (error) {
-    handleError(error);
-  }
-});
-
-//Helper Functions
-
-function Location(res, data) {
-  this.search_query = res;
-  this.formatted_query = data.body.results[0].formatted_address;
-  this.latitude = data.body.results[0].geometry.location.lat;
-  this.longitude = data.body.results[0].geometry.location.lng;
+function Location(city, geoData) {
+  // console.log('DATA IS: ' + geoData.body.results);
+  // console.log('CITY IS: ' + city);
+  this.search_query = city;
+  this.formatted_address = geoData.body.results[0].formatted_address;
+  this.latitude = geoData.body.results[0].geometry.location.lat;
+  this.longitude = geoData.body.results[0].geometry.location.lng;
 }
 
 function Forecast(day) {
@@ -56,6 +22,25 @@ function Forecast(day) {
   this.time = new Date(day.time * 1000).toString().slice(0, 15);
 }
 
+app.get("/location", (request, response) => {
+  searchLatLong(request.query.data).then(location => response.send(location));
+});
+app.get("/weather", (request, response) => {
+  const weatherData = require("./data/darksky.json");
+  const dailyWeather = Object.values(weatherData.daily.data);
+  const blob = dailyWeather.map(day => new Forecast(day));
+  // console.log(blob);
+  response.send(blob);
+});
+
+function handleError(err, response) {
+  console.error(err);
+  if (response) {
+    response.status(500).send("Sorry, something went wrong here.");
+  }
+}
+
+// Find the lat/long of the city entered into the search
 function searchLatLong(query) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${
     process.env.GEOCODE_API_KEY
@@ -64,3 +49,8 @@ function searchLatLong(query) {
     return new Location(query, res);
   });
 }
+
+// Listen for a connection on port number
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
+// https://api.darksky.net/forecast/9cd69fb927af39d2c47f00b3dc1f0caf/37.8267,-122.4233
