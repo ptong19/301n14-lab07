@@ -3,7 +3,7 @@
 # Project Name
 
 **Author**: James D
-**Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
+**Version**: 1.1.0 (increment the patch/fix version number if you make more commits past your first submission)
 
 ## Overview
 
@@ -22,10 +22,12 @@ i. map, lat/long, weather, etc.. 4. Package the returned data. 5. Send back the 
 
 <!-- Use this area to document the iterative changes made to your application as each feature is successfully implemented. Use time stamps. Here's an examples:
 
-07-30-2019 90m - Server is now deployed and functional. Next step is to link it to real APIs.
+07-30-2019 - Server is now deployed and functional. Next step is to link it to real APIs.
+
+07-31-2019 - Integrated live APIs and got map to display.
 
 ## Credits and Collaborations
-<!-- I worked on this server with Ryan Sanders. We built out the bare foundations of the server. -->
+<!-- I worked on this server with Ryan Sanders. We built out the bare foundations of the server. I worked on the API section with PT and got help from the TAs and instructors -->
 
 -->
 
@@ -55,3 +57,13 @@ Start time: 7:40
 Finish time: 9:40
 
 Actual time needed to complete: 2 hours
+
+## Step 3 - APIs
+
+Estimate of time needed to complete: 3 hours
+
+Start time: 6:30
+
+Finish time: 11:30
+
+Actual time needed to complete: 5 hours

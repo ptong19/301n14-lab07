@@ -20,12 +20,20 @@ function Forecast(day) {
   this.forecast = day.summary;
   this.time = new Date(day.time * 1000).toString().slice(0, 15);
 }
+
+function Event(event) {
+  this.link = event.url;
+  this.name = event.name.text;
+  this.event_date = new Date(event.start.local).toString().slice(0, 15);
+  this.summary = event.summary;
+}
 // app.use(express.static("./public"));
 app.use(cors());
 
 // Respond to GET requests from client
 app.get("/location", searchLatLong);
 app.get("/weather", getWeather);
+app.get("/events", getEvents);
 
 function handleError(error, response) {
   console.error(error);
@@ -62,6 +70,24 @@ function getWeather(request, response) {
         day => new Forecast(day)
       );
       response.send(weatherResults);
+    })
+    .catch(error => handleError(error, response));
+}
+
+function getEvents(request, response) {
+  // console.log("REQUEST : " + request.query.data.search_query);
+  const url = `https://www.eventbriteapi.com/v3/events/search?token=${
+    process.env.EVENTBRITE_API_KEY
+  }&location.address=${request.query.data.search_query}`;
+  superagent
+    .get(url)
+    .then(result => {
+      // console.log(result.body);
+      const events = result.body.events.map(data => {
+        return new Event(data);
+      });
+
+      response.send(events);
     })
     .catch(error => handleError(error, response));
 }
